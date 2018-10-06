@@ -27,7 +27,7 @@ string get_hash(int amount, string sender, string receiver, string nonce)
 	return hex_str;
 }
 
-void printBlock()
+void Transaction::printBlock()
 {
 	ostringstream oss;
 	
