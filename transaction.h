@@ -26,12 +26,13 @@ class Transaction{
 	void setHash(string hash){this->hash = hash;}
 	string getHash(){return this->hash;}
 
-	void setNext(Transaction& transaction_address){this->next = &transaction_address;}
+	void setNext(Transaction* transaction_address){this->next = transaction_address;}
 	Transaction* getNext(){return next;} 
 
 	//Print and other non-setters/getters
-	void printBlock();
-	
+	void print_block();
+	std::string gen_hash(string nonce);
+ 
 	private:
 		Transaction *next;
 		int amount;
@@ -39,9 +40,6 @@ class Transaction{
 		string receiver;
 		string nonce;
 		string hash;
-
-		//Helper Functions
-		string gen_hash(int amount, string sender, string receiver, string nonce); 
 };
 
 #endif

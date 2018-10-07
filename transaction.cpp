@@ -13,11 +13,11 @@ Transaction::Transaction(int amount, string sender, string receiver)
 	this->receiver = receiver;
 }
 
-string get_hash(int amount, string sender, string receiver, string nonce)
+string Transaction::gen_hash(string nonce)
 {
 
 	// any STL sequantial container (vector, list, dequeue...)
-	std::string src_str = to_string(amount) + sender + receiver + nonce;
+	std::string src_str = to_string(this->amount) + this->sender + this->receiver + nonce;
 
 	std::vector<unsigned char> hash(picosha2::k_digest_size);
 	picosha2::hash256(src_str.begin(), src_str.end(), hash.begin(), hash.end());
@@ -27,14 +27,15 @@ string get_hash(int amount, string sender, string receiver, string nonce)
 	return hex_str;
 }
 
-void Transaction::printBlock()
+void Transaction::print_block()
 {
 	ostringstream oss;
 	
-	oss << "Amount Transfered: " << this->amount << "\n" 
-		<< "Sender           : " << this->sender << "\n"
-		<< "Receiver         : " << this->receiver << "\n"
-		<< "Nonce            : " << this->nonce << endl;
+	oss << "Amount Transfered : " << this->amount << "\n" 
+		<< "Sender            : " << this->sender << "\n"
+		<< "Receiver          : " << this->receiver << "\n"
+		<< "Nonce             : " << this->nonce << "\n"
+		<< "Hash              : " << this->hash << "\n" << endl;
 		
 	string print_str = oss.str();
 	cout << print_str << endl;
