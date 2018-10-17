@@ -1,5 +1,6 @@
 #include "blockchain.h"
 #include "transaction.h"
+#include "sha.h"
 #include <iostream>
 #include <sstream>
 #include <string>
@@ -7,13 +8,26 @@
 
 using namespace std;
 
-Blockchain::Blockchain(int amount, string sender, string receiver){
+Blockchain::Blockchain()
+{
+	this->head=NULL;
+}
+
+Blockchain::Blockchain(int amount, string sender, string receiver)
+{
 	this->head = new Transaction(amount, sender, receiver);
-	head->setNonce("FIRST BLOCK - NO NONCE");
+	this->head->setHash("");
+	this->head->setNonce("");	
 }
 
 void Blockchain::new_block(int amount, string sender, string receiver)
 {
+	if (this->head == NULL)
+	{
+		this->head = new Transaction(amount, sender, receiver);
+		return;
+	}
+
 	Transaction* newBlock = new Transaction(amount, sender, receiver);
 	
 	//First set new head to be new block
@@ -53,6 +67,40 @@ string Blockchain::gen_nonce()
 
 }
 
+bool Blockchain::verify_and_print()
+{
+	for (Transaction* tmp = head; tmp->getNext() != NULL; tmp = tmp->getNext())
+	{
+		string amount = to_string(tmp->getNext()->getAmount());
+		string sender = tmp->getNext()->getSender();
+		string receiver = tmp->getNext()->getReceiver();
+		string nonce = tmp->getNonce();
+		string _hash = amount + sender + receiver + nonce;
+		if (get_hash(_hash) != tmp->getHash())
+		{
+			tmp->print_block();
+			tmp->getNext()->print_block();
+			return false;
+		}
+
+	}
+
+	this->print_chain();
+	return true;
+
+}
+
+void Blockchain::find_transaction(string sender)
+{
+	for (Transaction* p = head; p != NULL ; p = p->getNext())
+	{
+		if (p->getSender() == sender)
+		{
+			p->print_block();
+		}
+	}
+}
+
 bool Blockchain::is_not_valid(string hash){
 	char last_char = hash.back();
 
@@ -69,4 +117,16 @@ void Blockchain::print_chain()
 	{
 		p->print_block();
 	}
+}
+
+string Blockchain::get_hash(string src_str)
+{
+	// any STL sequantial container (vector, list, dequeue...)
+
+	std::vector<unsigned char> hash(picosha2::k_digest_size);
+	picosha2::hash256(src_str.begin(), src_str.end(), hash.begin(), hash.end());
+
+	std::string hex_str = picosha2::bytes_to_hex_string(hash.begin(), hash.end());
+	
+	return hex_str;
 }
