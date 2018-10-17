@@ -69,6 +69,13 @@ string Blockchain::gen_nonce()
 
 bool Blockchain::verify_and_print()
 {
+
+	if (this->head == NULL)
+	{
+		cout << "EMPTY CHAIN" << endl;
+		return true;
+	}
+
 	for (Transaction* tmp = head; tmp->getNext() != NULL; tmp = tmp->getNext())
 	{
 		string amount = to_string(tmp->getNext()->getAmount());
